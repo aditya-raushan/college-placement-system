@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import badge %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Reports &amp; Statistics</h2>
+  <a class="btn btn-outline-primary" href="{{ url_for('admin.export_csv') }}">⬇ Download student status (CSV)</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-4"><div class="card-header bg-white"><strong>Students eligible for a drive</strong></div><div class="card-body">
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-md-6"><select class="form-select" name="drive_id" required>
+      <option value="">Choose a drive...</option>
+      {% for d in drives %}<option value="{{ d.drive_id }}" {{ 'selected' if d.drive_id == drive_id }}>{{ d.company_name }} - {{ d.job_role }}</option>{% endfor %}</select></div>
+    <div class="col-auto"><button class="btn btn-primary">Show eligible students</button></div>
+  </form>
+  {% if drive_id %}
+  <div class="table-responsive"><table class="table table-sm mb-0">
+    <thead><tr><th>USN</th><th>Name</th><th>Branch</th><th>CGPA</th><th>Backlogs</th></tr></thead>
+    <tbody>{% for s in eligible %}<tr><td>{{ s.usn }}</td><td>{{ s.name }}</td><td>{{ s.branch }}</td><td>{{ s.cgpa }}</td><td>{{ s.backlogs }}</td></tr>
+    {% else %}<tr><td colspan="5" class="text-muted">No eligible students.</td></tr>{% endfor %}</tbody></table></div>
+  {% endif %}
+</div></div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-header bg-white"><strong>Applications per company</strong></div>
+    <div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Company</th><th>Applications</th></tr></thead>
+    <tbody>{% for r in per_company %}<tr><td>{{ r.company_name }}</td><td>{{ r.applications }}</td></tr>{% endfor %}</tbody></table></div></div></div>
+  <div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-header bg-white"><strong>Branch statistics</strong> <small class="text-muted">(branches with 2+ students)</small></div>
+    <div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Branch</th><th>Students</th><th>Avg</th><th>Min</th><th>Max</th></tr></thead>
+    <tbody>{% for r in branch_stats %}<tr><td>{{ r.branch }}</td><td>{{ r.students }}</td><td>{{ r.avg_cgpa }}</td><td>{{ r.min_cgpa }}</td><td>{{ r.max_cgpa }}</td></tr>
+    {% else %}<tr><td colspan="5" class="text-muted">No data.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4"><div class="card-header bg-white"><strong>Selection percentage per drive</strong></div>
+  <div class="table-responsive"><table class="table table-sm mb-0 align-middle">
+  <thead><tr><th>Company</th><th>Role</th><th>Applicants</th><th>Selected</th><th style="width:30%">Selection %</th></tr></thead>
+  <tbody>{% for r in selection %}<tr><td>{{ r.company_name }}</td><td>{{ r.job_role }}</td><td>{{ r.applicants }}</td><td>{{ r.selected }}</td>
+    <td><div class="progress" style="height:18px"><div class="progress-bar bg-success" style="width: {{ r.selection_percentage }}%">{{ r.selection_percentage }}%</div></div></td></tr>{% endfor %}</tbody></table></div></div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-header bg-white"><strong>Students above average CGPA</strong> <small class="text-muted">(average {{ avg_cgpa }})</small></div>
+    <div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>USN</th><th>Name</th><th>Branch</th><th>CGPA</th></tr></thead>
+    <tbody>{% for s in above_avg %}<tr><td>{{ s.usn }}</td><td>{{ s.name }}</td><td>{{ s.branch }}</td><td>{{ s.cgpa }}</td></tr>{% else %}<tr><td colspan="4" class="text-muted">No data.</td></tr>{% endfor %}</tbody></table></div></div></div>
+  <div class="col-lg-6"><div class="card border-0 shadow-sm h-100"><div class="card-header bg-white"><strong>Drives with no applications</strong></div>
+    <div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Company</th><th>Role</th><th>Deadline</th></tr></thead>
+    <tbody>{% for d in no_apps %}<tr><td>{{ d.company_name }}</td><td>{{ d.job_role }}</td><td>{{ d.deadline.strftime('%d %b %Y') }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Every drive has applicants.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm"><div class="card-header bg-white"><strong>Student-wise placement status</strong></div>
+  <div class="table-responsive"><table class="table table-sm mb-0 align-middle">
+  <thead><tr><th>USN</th><th>Name</th><th>Branch</th><th>CGPA</th><th>Backlogs</th><th>Applications</th><th>Selections</th><th>Status</th></tr></thead>
+  <tbody>{% for r in status_report %}<tr><td>{{ r.usn }}</td><td>{{ r.name }}</td><td>{{ r.branch }}</td><td>{{ r.cgpa }}</td><td>{{ r.backlogs }}</td><td>{{ r.total_applications }}</td><td>{{ r.selected_count }}</td><td>{{ badge(r.placement_status) }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

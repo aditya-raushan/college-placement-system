@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf, badge %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<h2 class="mb-3">Applications ({{ applications|length }})</h2>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-4"><select class="form-select" name="drive_id"><option value="">All drives</option>
+    {% for d in drives %}<option value="{{ d.drive_id }}" {{ 'selected' if d.drive_id == drive_id }}>{{ d.company_name }} - {{ d.job_role }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><select class="form-select" name="status"><option value="">All statuses</option>
+    {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|capitalize }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><input class="form-control" name="q" value="{{ q }}" placeholder="Student name or USN"></div>
+  <div class="col-auto"><button class="btn btn-primary">Filter</button> <a class="btn btn-outline-secondary" href="{{ url_for('applications.manage') }}">Reset</a></div>
+</form>
+<div class="card border-0 shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Student</th><th>USN</th><th>Branch</th><th>CGPA</th><th>Company / Role</th><th>Applied</th><th>Status</th><th>Change status</th></tr></thead>
+  <tbody>
+  {% for a in applications %}
+    <tr><td>{{ a.student_name }}</td><td>{{ a.usn }}</td><td>{{ a.branch }}</td><td>{{ a.cgpa }}</td>
+        <td>{{ a.company_name }}<div class="small text-muted">{{ a.job_role }}</div></td>
+        <td>{{ a.applied_at.strftime('%d %b %Y') }}</td><td>{{ badge(a.status) }}</td>
+        <td>
+          <form method="post" class="d-flex gap-1" action="{{ url_for('applications.update_status', application_id=a.application_id) }}">
+            {{ csrf() }}<input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}">
+            <select class="form-select form-select-sm" name="status">
+              {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == a.status }}>{{ s|capitalize }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-sm btn-primary">Save</button>
+          </form>
+        </td></tr>
+  {% else %}<tr><td colspan="8" class="text-center text-muted py-4">No applications found.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

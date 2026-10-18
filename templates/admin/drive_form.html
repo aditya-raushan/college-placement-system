@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}{{ 'Create' if mode == 'add' else 'Edit' }} Drive{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-9"><div class="card border-0 shadow-sm"><div class="card-body p-4">
+  <h3 class="mb-3">{{ 'Create' if mode == 'add' else 'Edit' }} Placement Drive</h3>
+  {% if not companies %}<div class="alert alert-warning">Add a company first. <a href="{{ url_for('companies.add_company') }}">Add company</a></div>{% endif %}
+  <form method="post" class="needs-validation" novalidate>
+    {{ csrf() }}
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="company_id">Company</label>
+        <select class="form-select" id="company_id" name="company_id" required>
+          <option value="">Choose...</option>
+          {% for c in companies %}<option value="{{ c.company_id }}" {{ 'selected' if drive.get('company_id')|string == c.company_id|string }}>{{ c.company_name }}</option>{% endfor %}
+        </select></div>
+      <div class="col-md-6"><label class="form-label" for="job_role">Job role</label>
+        <input class="form-control" id="job_role" name="job_role" required maxlength="100" value="{{ drive.get('job_role') or '' }}"></div>
+      <div class="col-md-3"><label class="form-label" for="minimum_cgpa">Minimum CGPA</label>
+        <input class="form-control" type="number" step="0.01" min="0" max="10" id="minimum_cgpa" name="minimum_cgpa" required value="{{ drive.get('minimum_cgpa') if drive.get('minimum_cgpa') is not none else '' }}"></div>
+      <div class="col-md-3"><label class="form-label" for="maximum_backlogs">Max backlogs</label>
+        <input class="form-control" type="number" min="0" max="50" id="maximum_backlogs" name="maximum_backlogs" required value="{{ drive.get('maximum_backlogs') if drive.get('maximum_backlogs') is not none else '0' }}"></div>
+      <div class="col-md-3"><label class="form-label" for="package_lpa">Package (LPA)</label>
+        <input class="form-control" type="number" step="0.01" min="0" id="package_lpa" name="package_lpa" required value="{{ drive.get('package_lpa') if drive.get('package_lpa') is not none else '' }}"></div>
+      <div class="col-md-3"><label class="form-label" for="status">Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="open" {{ 'selected' if drive.get('status', 'open') == 'open' }}>Open</option>
+          <option value="closed" {{ 'selected' if drive.get('status') == 'closed' }}>Closed</option></select></div>
+      <div class="col-md-6"><label class="form-label" for="deadline">Deadline</label>
+        <input class="form-control" type="datetime-local" id="deadline" name="deadline" required value="{{ drive.get('deadline') or '' }}"></div>
+      <div class="col-md-6"><label class="form-label" for="skills">Required skills (comma separated)</label>
+        <input class="form-control" id="skills" name="skills" value="{{ drive.get('skills') or '' }}" placeholder="Java, SQL"></div>
+      <div class="col-12"><label class="form-label" for="job_description">Job description</label>
+        <textarea class="form-control" id="job_description" name="job_description" rows="4">{{ drive.get('job_description') or '' }}</textarea></div>
+    </div>
+    <button class="btn btn-primary mt-4" {{ 'disabled' if not companies }}>Save drive</button>
+    <a class="btn btn-link mt-4" href="{{ url_for('companies.list_drives') }}">Cancel</a>
+  </form>
+</div></div></div></div>
+{% endblock %}

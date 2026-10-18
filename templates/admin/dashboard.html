@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import badge, stat_card, avatar %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-1">{{ greeting }}, {{ session.name|first_name }} 👋</h2>
+<p class="text-muted mb-4">Here is where placements stand today.</p>
+
+{% if pending %}
+<div class="attention p-3 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+  <span>📬 <strong>{{ pending }}</strong> application{{ '' if pending == 1 else 's' }} waiting for review.</span>
+  <a class="btn btn-sm btn-warning" href="{{ url_for('applications.manage', status='applied') }}">Review now</a>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  {{ stat_card('Students', stats.students) }}
+  {{ stat_card('Companies', stats.companies, 'info') }}
+  {{ stat_card('Drives', stats.drives, 'secondary') }}
+  {{ stat_card('Open drives', stats.open_drives, 'warning') }}
+  {{ stat_card('Applications', stats.applications, 'primary') }}
+  {{ stat_card('Students placed', stats.selected_students, 'success') }}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4"><div class="card border-0 shadow-sm h-100"><div class="card-body">
+    <h5>Placement rate</h5>
+    <div class="display-5 fw-bold text-success">{{ placement_pct }}%</div>
+    <div class="progress mb-4" style="height:10px"><div class="progress-bar bg-success" style="width: {{ placement_pct }}%"></div></div>
+    <h6>Applications by status</h6>
+    {% for s in by_status %}<div class="d-flex justify-content-between align-items-center mb-1">{{ badge(s.status) }}<strong>{{ s.n }}</strong></div>{% else %}<p class="text-muted">No applications yet.</p>{% endfor %}
+    <hr>
+    <h6>Closing within 7 days</h6>
+    {% for d in closing_soon %}
+      <div class="d-flex justify-content-between small py-1"><span>{{ d.company_name }} &middot; {{ d.job_role }}</span>
+        <a href="{{ url_for('applications.manage', drive_id=d.drive_id) }}">{{ d.applicants }} applied</a></div>
+    {% else %}<p class="text-muted small mb-0">No drives closing this week.</p>{% endfor %}
+  </div></div></div>
+  <div class="col-lg-8"><div class="card border-0 shadow-sm"><div class="card-header bg-white d-flex justify-content-between"><span>Latest applications</span><a class="small" href="{{ url_for('applications.manage') }}">See all</a></div>
+    <div class="card-body">
+      {% for a in recent %}
+        <div class="d-flex justify-content-between align-items-center py-2 {{ 'border-top' if not loop.first }}">
+          <div class="d-flex align-items-center gap-3">{{ avatar(a.student_name, 'sm') }}
+            <div><strong>{{ a.student_name }}</strong><div class="small text-muted">{{ a.job_role }} at {{ a.company_name }}</div></div></div>
+          {{ badge(a.status) }}
+        </div>
+      {% else %}<div class="empty"><div class="emoji">📭</div><p class="mb-0">No applications yet. They will appear here as students apply.</p></div>{% endfor %}
+    </div></div></div>
+</div>
+{% endblock %}

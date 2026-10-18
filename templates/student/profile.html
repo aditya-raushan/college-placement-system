@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+{% set f = form if form else student %}
+<div class="row justify-content-center"><div class="col-lg-8">
+<div class="card border-0 shadow-sm"><div class="card-body p-4">
+  <h3 class="mb-3">My Profile</h3>
+  <p class="text-muted small">Email: {{ student.email }} (cannot be changed)</p>
+  <form method="post" class="needs-validation" novalidate>
+    {{ csrf() }}
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="name">Full name</label>
+        <input class="form-control" id="name" name="name" required minlength="2" maxlength="100" value="{{ f.get('name') if form else student.name }}"></div>
+      <div class="col-md-6"><label class="form-label" for="usn">USN</label>
+        <input class="form-control text-uppercase" id="usn" name="usn" required pattern="[A-Za-z0-9]{5,20}" value="{{ f.get('usn') if form else student.usn }}"></div>
+      <div class="col-md-4"><label class="form-label" for="branch">Branch</label>
+        <select class="form-select" id="branch" name="branch" required>
+          {% for b in BRANCHES %}<option value="{{ b }}" {{ 'selected' if (f.get('branch') if form else student.branch) == b }}>{{ b }}</option>{% endfor %}
+        </select></div>
+      <div class="col-md-4"><label class="form-label" for="semester">Semester</label>
+        <input class="form-control" type="number" min="1" max="8" id="semester" name="semester" required value="{{ f.get('semester') if form else student.semester }}"></div>
+      <div class="col-md-4"><label class="form-label" for="cgpa">CGPA</label>
+        <input class="form-control" type="number" step="0.01" min="0" max="10" id="cgpa" name="cgpa" required value="{{ f.get('cgpa') if form else student.cgpa }}"></div>
+      <div class="col-md-6"><label class="form-label" for="backlogs">Current backlogs</label>
+        <input class="form-control" type="number" min="0" max="50" id="backlogs" name="backlogs" required value="{{ f.get('backlogs') if form else student.backlogs }}"></div>
+      <div class="col-md-6"><label class="form-label" for="graduation_year">Graduation year</label>
+        <input class="form-control" type="number" min="2000" max="2100" id="graduation_year" name="graduation_year" required value="{{ f.get('graduation_year') if form else student.graduation_year }}"></div>
+      <div class="col-12"><label class="form-label" for="skills">Skills (comma separated)</label>
+        <input class="form-control" id="skills" name="skills" value="{{ skills }}"></div>
+    </div>
+    <button class="btn btn-primary mt-4">Save changes</button>
+  </form>
+</div></div></div></div>
+{% endblock %}

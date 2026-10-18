@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<h2 class="mb-3">Registered Students ({{ students|length }})</h2>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-5"><input class="form-control" name="q" value="{{ q }}" placeholder="Search name, USN or email"></div>
+  <div class="col-md-3"><select class="form-select" name="branch"><option value="">All branches</option>
+    {% for b in BRANCHES %}<option value="{{ b }}" {{ 'selected' if b == branch }}>{{ b }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button class="btn btn-primary">Filter</button> <a class="btn btn-outline-secondary" href="{{ url_for('admin.students') }}">Reset</a></div>
+</form>
+<div class="card border-0 shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>USN</th><th>Name</th><th>Email</th><th>Branch</th><th>Sem</th><th>CGPA</th><th>Backlogs</th><th>Grad.</th><th>Skills</th></tr></thead>
+  <tbody>
+  {% for s in students %}
+    <tr><td>{{ s.usn }}</td><td>{{ s.name }}</td><td>{{ s.email }}</td><td>{{ s.branch }}</td><td>{{ s.semester }}</td>
+        <td>{{ s.cgpa }}</td><td>{{ s.backlogs }}</td><td>{{ s.graduation_year }}</td><td class="small">{{ s.skills or '-' }}</td></tr>
+  {% else %}<tr><td colspan="9" class="text-center text-muted py-4">No students found.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

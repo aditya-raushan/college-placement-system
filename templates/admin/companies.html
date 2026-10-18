@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Companies</h2>
+  <a class="btn btn-primary" href="{{ url_for('companies.add_company') }}">+ Add company</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Search company or industry"></div>
+  <div class="col-auto"><button class="btn btn-primary">Search</button> <a class="btn btn-outline-secondary" href="{{ url_for('companies.list_companies') }}">Reset</a></div>
+</form>
+<div class="card border-0 shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Company</th><th>Industry</th><th>Website</th><th>Drives</th><th class="text-end">Actions</th></tr></thead>
+  <tbody>
+  {% for c in companies %}
+    <tr><td>{{ c.company_name }}</td><td>{{ c.industry }}</td>
+        <td>{% if c.website %}<a href="{{ c.website }}" target="_blank" rel="noopener noreferrer">{{ c.website }}</a>{% else %}-{% endif %}</td>
+        <td>{{ c.drive_count }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('companies.edit_company', company_id=c.company_id) }}">Edit</a>
+          <form method="post" class="d-inline" action="{{ url_for('companies.delete_company', company_id=c.company_id) }}" data-confirm="Delete {{ c.company_name }}? This cannot be undone.">
+            {{ csrf() }}<button class="btn btn-sm btn-outline-danger">Delete</button></form>
+        </td></tr>
+  {% else %}<tr><td colspan="5" class="text-center text-muted py-4">No companies found.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

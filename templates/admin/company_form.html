@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}{{ 'Add' if mode == 'add' else 'Edit' }} Company{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><div class="card border-0 shadow-sm"><div class="card-body p-4">
+  <h3 class="mb-3">{{ 'Add' if mode == 'add' else 'Edit' }} Company</h3>
+  <form method="post" class="needs-validation" novalidate>
+    {{ csrf() }}
+    <div class="mb-3"><label class="form-label" for="company_name">Company name</label>
+      <input class="form-control" id="company_name" name="company_name" required maxlength="120" value="{{ company.get('company_name') or '' }}"></div>
+    <div class="mb-3"><label class="form-label" for="industry">Industry</label>
+      <input class="form-control" id="industry" name="industry" required maxlength="80" value="{{ company.get('industry') or '' }}"></div>
+    <div class="mb-3"><label class="form-label" for="website">Website</label>
+      <input class="form-control" type="url" id="website" name="website" maxlength="200" placeholder="https://" value="{{ company.get('website') or '' }}"></div>
+    <div class="mb-3"><label class="form-label" for="description">Description</label>
+      <textarea class="form-control" id="description" name="description" rows="4">{{ company.get('description') or '' }}</textarea></div>
+    <button class="btn btn-primary">Save</button>
+    <a class="btn btn-link" href="{{ url_for('companies.list_companies') }}">Cancel</a>
+  </form>
+</div></div></div></div>
+{% endblock %}

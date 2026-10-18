@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+{% from '_macros.html' import csrf %}
+<div class="row justify-content-center"><div class="col-xl-9">
+<div class="card auth-card border-0 shadow"><div class="row g-0">
+  <div class="col-md-5 auth-side p-4 p-md-5 d-flex flex-column justify-content-center">
+    <h2 class="mb-3">Welcome back 👋</h2>
+    <p class="opacity-75">Pick up where you left off. Your applications and latest updates are waiting.</p>
+    <div class="tip p-3 small mt-3">New here? Students can create an account in under two minutes.</div>
+  </div>
+  <div class="col-md-7 p-4 p-md-5 bg-white">
+    <h3 class="mb-4">Log in</h3>
+    <form method="post" class="needs-validation" novalidate>
+      {{ csrf() }}
+      <div class="mb-3">
+        <label class="form-label" for="email">Email address</label>
+        <input class="form-control" type="email" id="email" name="email" value="{{ email }}" required maxlength="120" autofocus placeholder="you@example.com">
+        <div class="invalid-feedback">Please enter a valid email.</div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-control" type="password" id="password" name="password" required placeholder="Your password">
+        <div class="invalid-feedback">Please enter your password.</div>
+      </div>
+      <button class="btn btn-primary btn-lg w-100">Log in</button>
+    </form>
+    <p class="text-center mt-4 mb-0 small text-muted">Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a></p>
+  </div>
+</div></div>
+</div></div>
+{% endblock %}

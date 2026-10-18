@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import badge %}
+{% block title %}Selection Results{% endblock %}
+{% block content %}
+<h2 class="mb-3">Selection Results</h2>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <form class="mb-3 d-flex gap-2" method="get">
+      <select class="form-select w-auto" name="result"><option value="">All results</option>
+        <option value="selected" {{ 'selected' if result_status == 'selected' }}>Selected</option>
+        <option value="rejected" {{ 'selected' if result_status == 'rejected' }}>Rejected</option></select>
+      <button class="btn btn-primary">Filter</button>
+    </form>
+    <div class="card border-0 shadow-sm"><div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Student</th><th>USN</th><th>Branch</th><th>Company / Role</th><th>Package</th><th>Result</th><th>Updated</th></tr></thead>
+      <tbody>
+      {% for r in results %}
+        <tr><td>{{ r.student_name }}</td><td>{{ r.usn }}</td><td>{{ r.branch }}</td>
+            <td>{{ r.company_name }}<div class="small text-muted">{{ r.job_role }}</div></td>
+            <td>{{ r.package_lpa }} LPA</td><td>{{ badge(r.result_status) }}</td><td>{{ r.updated_at.strftime('%d %b %Y') }}</td></tr>
+      {% else %}<tr><td colspan="7" class="text-center text-muted py-4">No results recorded yet.</td></tr>{% endfor %}
+      </tbody>
+    </table></div></div>
+  </div>
+  <div class="col-lg-4"><div class="card border-0 shadow-sm"><div class="card-header bg-white"><strong>Selections per drive</strong></div>
+    <ul class="list-group list-group-flush">
+    {% for p in per_drive %}<li class="list-group-item d-flex justify-content-between"><span>{{ p.company_name }}<br><small class="text-muted">{{ p.job_role }}</small></span><span class="badge text-bg-success align-self-center">{{ p.selected }} selected</span></li>
+    {% else %}<li class="list-group-item text-muted">No data.</li>{% endfor %}
+    </ul></div></div>
+</div>
+{% endblock %}

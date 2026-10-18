@@ -1,0 +1,32 @@
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro badge(status) %}
+{% set colors = {'applied':'secondary','shortlisted':'info','selected':'success','rejected':'danger','open':'success','closed':'secondary','Placed':'success','In process':'warning','Not applied':'secondary'} %}
+<span class="badge text-bg-{{ colors.get(status, 'secondary') }}">{{ status|capitalize if status in ['applied','shortlisted','selected','rejected','open','closed'] else status }}</span>
+{% endmacro %}
+
+{% macro stat_card(label, value, color='primary') %}
+<div class="col-6 col-lg-4 col-xl-2">
+  <div class="card stat-card border-0 shadow-sm h-100">
+    <div class="card-body">
+      <div class="text-muted small text-uppercase">{{ label }}</div>
+      <div class="display-6 fw-bold text-{{ color }}">{{ value }}</div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro avatar(name, size='', kind='') %}
+<span class="avatar {{ size }} {{ kind }}">{{ name|initials }}</span>
+{% endmacro %}
+
+{% macro pipeline(status) %}
+{% set rank = {'applied': 1, 'shortlisted': 2, 'selected': 3, 'rejected': 3}[status] %}
+<div class="pipeline">
+  <span class="step {{ 'done' if rank > 1 else 'active' }}">Applied</span>
+  <span class="bar {{ 'done' if rank > 1 }}"></span>
+  <span class="step {{ 'done' if rank > 2 else ('active' if rank == 2 else '') }}">Shortlisted</span>
+  <span class="bar {{ 'done' if rank > 2 }}"></span>
+  <span class="step {{ 'selected' if status == 'selected' else ('rejected' if status == 'rejected' else '') }}">{{ 'Selected 🎉' if status == 'selected' else ('Not selected' if status == 'rejected' else 'Decision') }}</span>
+</div>
+{% endmacro %}

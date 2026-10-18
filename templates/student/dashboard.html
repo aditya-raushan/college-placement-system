@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import avatar, stat_card, pipeline %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="welcome-card shadow-sm p-4 mb-4 d-flex align-items-center gap-3">
+  {{ avatar(student.name, 'lg') }}
+  <div>
+    <h2 class="mb-0">{{ greeting }}, {{ student.name|first_name }}!</h2>
+    <div class="text-muted">{{ student.usn }} &middot; {{ student.branch }} &middot; CGPA {{ student.cgpa }} &middot; {{ student.backlogs }} backlog{{ '' if student.backlogs == 1 else 's' }}</div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  {{ stat_card('Applications', counts.total) }}
+  {{ stat_card('Shortlisted', counts.shortlisted, 'info') }}
+  {{ stat_card('Selected', counts.selected, 'success') }}
+  {{ stat_card('Not selected', counts.rejected, 'danger') }}
+  {{ stat_card('Open for you', eligible_open, 'warning') }}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span>Your recent applications</span>
+        <a href="{{ url_for('applications.my_applications') }}" class="small">See all</a>
+      </div>
+      <div class="card-body">
+        {% for a in recent %}
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 py-3 {{ 'border-top' if not loop.first }}">
+            <div class="d-flex align-items-center gap-3">
+              {{ avatar(a.company_name, '', 'company') }}
+              <div><strong>{{ a.job_role }}</strong><div class="small text-muted">{{ a.company_name }} &middot; applied {{ a.applied_at.strftime('%d %b') }}</div></div>
+            </div>
+            {{ pipeline(a.status) }}
+          </div>
+        {% else %}
+          <div class="empty"><div class="emoji">🌱</div>
+            <p class="mb-3">You haven't applied anywhere yet. That's okay &mdash; every journey starts somewhere.</p>
+            <a class="btn btn-primary" href="{{ url_for('student.drives') }}">Browse open drives</a></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white">Closing soon, and you qualify</div>
+      <div class="card-body">
+        {% for d in upcoming %}
+          <div class="d-flex align-items-center gap-3 py-2 {{ 'border-top' if not loop.first }}">
+            {{ avatar(d.company_name, '', 'company') }}
+            <div class="flex-grow-1"><strong>{{ d.job_role }}</strong>
+              <div class="small text-muted">{{ d.company_name }} &middot; {{ d.package_lpa }} LPA</div></div>
+            <span class="chip {{ 'urgent' if d.days_left <= 2 }}">{{ 'Today' if d.days_left == 0 else (d.days_left ~ ' day' ~ ('' if d.days_left == 1 else 's')) }}</span>
+          </div>
+        {% else %}
+          <div class="empty"><div class="emoji">☕</div><p class="mb-0">Nothing urgent right now. Check back soon or update your profile to match more drives.</p></div>
+        {% endfor %}
+        <a class="btn btn-outline-primary w-100 mt-3" href="{{ url_for('student.drives') }}">View all drives</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

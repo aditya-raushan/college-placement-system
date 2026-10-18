@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Student Registration{% endblock %}
+{% block content %}
+{% from '_macros.html' import csrf %}
+<div class="row justify-content-center"><div class="col-lg-8">
+  <div class="card shadow border-0"><div class="card-body p-4 p-md-5"></div>
+    <h3 class="mb-1">Create your student account</h3>
+    <p class="text-muted mb-4">Tell us a little about yourself. You can change these details later from your profile.</p>
+    <form method="post" class="needs-validation" novalidate>
+      {{ csrf() }}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="name">Full name</label>
+          <input class="form-control" id="name" name="name" value="{{ form.get('name','') }}" required minlength="2" maxlength="100">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-control" type="email" id="email" name="email" value="{{ form.get('email','') }}" required maxlength="120">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control" type="password" id="password" name="password" required minlength="8" pattern="(?=.*[A-Za-z])(?=.*\d).{8,}">
+          <div class="form-text">At least 8 characters, with a letter and a digit.</div>
+          <div class="invalid-feedback">Weak password.</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="confirm_password">Confirm password</label>
+          <input class="form-control" type="password" id="confirm_password" name="confirm_password" required data-match="password">
+          <div class="invalid-feedback">Passwords must match.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="usn">USN</label>
+          <input class="form-control text-uppercase" id="usn" name="usn" value="{{ form.get('usn','') }}" required pattern="[A-Za-z0-9]{5,20}" maxlength="20">
+          <div class="invalid-feedback">5-20 letters/digits.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="branch">Branch</label>
+          <select class="form-select" id="branch" name="branch" required>
+            <option value="">Choose...</option>
+            {% for b in BRANCHES %}<option value="{{ b }}" {{ 'selected' if form.get('branch') == b }}>{{ b }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="semester">Semester</label>
+          <input class="form-control" type="number" id="semester" name="semester" min="1" max="8" value="{{ form.get('semester','') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="cgpa">CGPA</label>
+          <input class="form-control" type="number" step="0.01" min="0" max="10" id="cgpa" name="cgpa" value="{{ form.get('cgpa','') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="backlogs">Current backlogs</label>
+          <input class="form-control" type="number" min="0" max="50" id="backlogs" name="backlogs" value="{{ form.get('backlogs','0') }}" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="graduation_year">Graduation year</label>
+          <input class="form-control" type="number" min="2000" max="2100" id="graduation_year" name="graduation_year" value="{{ form.get('graduation_year','') }}" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="skills">Skills (comma separated)</label>
+          <input class="form-control" id="skills" name="skills" value="{{ form.get('skills','') }}" placeholder="Python, SQL, Java">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg mt-4">Create my account</button>
+      <a class="btn btn-link mt-4" href="{{ url_for('auth.login') }}">Already registered?</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf, badge, avatar %}
+{% block title %}Placement Drives{% endblock %}
+{% block content %}
+<h2 class="mb-1">Open drives</h2>
+<p class="text-muted mb-4">Green means you meet the requirements. Red tells you exactly what is missing.</p>
+<form class="row g-2 mb-4" method="get">
+  <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Search company or role"></div>
+  <div class="col-auto d-flex align-items-center">
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="eligible" value="1" id="el" {{ 'checked' if only_eligible }}>
+    <label class="form-check-label" for="el">Eligible only</label></div></div>
+  <div class="col-auto"><button class="btn btn-primary">Filter</button> <a class="btn btn-outline-secondary" href="{{ url_for('student.drives') }}">Reset</a></div>
+</form>
+<div class="row g-4">
+{% for d in drives %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card h-100 border-0 shadow-sm drive-card {{ 'eligible' if d.eligible else 'ineligible' }}">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div class="d-flex align-items-center gap-2">
+            {{ avatar(d.company_name, '', 'company') }}
+            <div><h5 class="mb-0">{{ d.job_role }}</h5><div class="text-muted small">{{ d.company_name }} &middot; {{ d.industry }}</div></div>
+          </div>
+          {% if d.my_status %}{{ badge(d.my_status) }}
+          {% elif d.eligible %}<span class="badge text-bg-success">Eligible</span>
+          {% else %}<span class="badge text-bg-danger">Not eligible</span>{% endif %}
+        </div>
+        <div class="mb-2">
+          <span class="chip">💰 {{ d.package_lpa }} LPA</span>
+          <span class="chip">🎓 CGPA {{ d.minimum_cgpa }}+</span>
+          <span class="chip">📚 Up to {{ d.maximum_backlogs }} backlog{{ '' if d.maximum_backlogs == 1 else 's' }}</span>
+          {% if d.expired %}<span class="chip urgent">Deadline passed</span>
+          {% else %}<span class="chip {{ 'urgent' if d.days_left <= 2 }}">⏰ {{ 'Closes today' if d.days_left == 0 else ('Closes in ' ~ d.days_left ~ ' day' ~ ('' if d.days_left == 1 else 's')) }}</span>{% endif %}
+        </div>
+        {% if d.skills %}<div class="mb-2">{% for sk in d.skills.split(', ') %}<span class="chip skill">{{ sk }}</span>{% endfor %}</div>{% endif %}
+        {% if d.job_description %}<p class="small text-muted">{{ d.job_description[:140] }}{{ '…' if d.job_description|length > 140 }}</p>{% endif %}
+        {% if d.missing_skills %}<p class="small text-warning-emphasis mb-2">Skills to add: {{ d.missing_skills|join(', ') }}</p>{% endif %}
+        {% if not d.eligible %}<p class="small text-danger mb-2">{{ d.reasons|join(' · ') }}</p>{% endif %}
+        <div class="mt-auto">
+          {% if d.my_status %}
+            <button class="btn btn-secondary w-100" disabled>Already applied</button>
+          {% elif d.can_apply %}
+            <form method="post" action="{{ url_for('applications.apply', drive_id=d.drive_id) }}" data-confirm="Apply to {{ d.company_name }} - {{ d.job_role }}?">
+              {{ csrf() }}<button class="btn btn-primary w-100">Apply now</button>
+            </form>
+          {% else %}
+            <button class="btn btn-outline-secondary w-100" disabled>Cannot apply</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="col-12"><div class="empty"><div class="emoji">🔍</div><p>No drives match your filters. Try clearing the search.</p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

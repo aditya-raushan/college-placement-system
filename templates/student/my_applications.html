@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import avatar, pipeline %}
+{% block title %}My Applications{% endblock %}
+{% block content %}
+<h2 class="mb-1">My applications</h2>
+<p class="text-muted mb-4">Follow each application from "applied" to the final decision.</p>
+<div class="card border-0 shadow-sm"><div class="card-body">
+{% for a in applications %}
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 py-3 {{ 'border-top' if not loop.first }}">
+    <div class="d-flex align-items-center gap-3">
+      {{ avatar(a.company_name, '', 'company') }}
+      <div><strong>{{ a.job_role }}</strong>
+        <div class="small text-muted">{{ a.company_name }} &middot; {{ a.package_lpa }} LPA &middot; applied {{ a.applied_at.strftime('%d %b %Y') }}</div></div>
+    </div>
+    {{ pipeline(a.status) }}
+  </div>
+{% else %}
+  <div class="empty"><div class="emoji">📭</div>
+    <p class="mb-3">No applications yet. Find a drive that fits you and give it a go.</p>
+    <a class="btn btn-primary" href="{{ url_for('student.drives') }}">Browse drives</a></div>
+{% endfor %}
+</div></div>
+{% endblock %}

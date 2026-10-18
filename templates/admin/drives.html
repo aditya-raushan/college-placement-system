@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf, badge %}
+{% block title %}Placement Drives{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Placement Drives</h2>
+  <a class="btn btn-primary" href="{{ url_for('companies.add_drive') }}">+ Create drive</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-5"><input class="form-control" name="q" value="{{ q }}" placeholder="Search company or role"></div>
+  <div class="col-md-3"><select class="form-select" name="status"><option value="">All statuses</option>
+    <option value="open" {{ 'selected' if status == 'open' }}>Open</option><option value="closed" {{ 'selected' if status == 'closed' }}>Closed</option></select></div>
+  <div class="col-auto"><button class="btn btn-primary">Filter</button> <a class="btn btn-outline-secondary" href="{{ url_for('companies.list_drives') }}">Reset</a></div>
+</form>
+<div class="card border-0 shadow-sm"><div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+  <thead><tr><th>Company</th><th>Role</th><th>Package</th><th>Min CGPA</th><th>Max backlogs</th><th>Deadline</th><th>Status</th><th>Applicants</th><th class="text-end">Actions</th></tr></thead>
+  <tbody>
+  {% for d in drives %}
+    <tr><td>{{ d.company_name }}</td><td>{{ d.job_role }}</td><td>{{ d.package_lpa }} LPA</td><td>{{ d.minimum_cgpa }}</td><td>{{ d.maximum_backlogs }}</td>
+        <td>{{ d.deadline.strftime('%d %b %Y %H:%M') }}{% if d.expired %} <span class="badge text-bg-warning">Expired</span>{% endif %}</td>
+        <td>{{ badge(d.status) }}</td>
+                <td><a href="{{ url_for('applications.manage', drive_id=d.drive_id) }}">{{ d.applicants }}</a></td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('companies.edit_drive', drive_id=d.drive_id) }}">Edit</a>
+          {% if d.status == 'open' %}
+          <form method="post" class="d-inline" action="{{ url_for('companies.close_drive', drive_id=d.drive_id) }}" data-confirm="Close this drive? Students will no longer be able to apply.">
+            {{ csrf() }}<button class="btn btn-sm btn-outline-warning">Close</button></form>
+          {% endif %}
+          <form method="post" class="d-inline" action="{{ url_for('companies.delete_drive', drive_id=d.drive_id) }}" data-confirm="Delete this drive permanently?">
+            {{ csrf() }}<button class="btn btn-sm btn-outline-danger">Delete</button></form>
+        </td></tr>
+  {% else %}<tr><td colspan="9" class="text-center text-muted py-4">No drives found.</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}
